@@ -1,0 +1,35 @@
+default_stages: [commit]
+
+repos:
+  - repo: local
+    hooks:
+      - id: fmt
+        name: Format
+        entry: cargo +nightly fmt --all
+        language: system
+        types_or: [rust]
+        pass_filenames: false
+      - id: clippy
+        name: Clippy
+        entry: cargo clippy --all-features --all-targets
+        language: system
+        types_or: [rust]
+        pass_filenames: false
+      - id: test
+        name: Test
+        entry: cargo test --verbose --workspace --all-features --all-targets
+        language: system
+        types_or: [rust]
+        pass_filenames: false
+      - id: test-docs
+        name: Test Docs
+        entry: cargo test --verbose --workspace --all-features --doc
+        language: system
+        types_or: [rust]
+        pass_filenames: false
+      - id: build-docs
+        name: Build Docs
+        entry: cargo doc --workspace --all-features --no-deps
+        language: system
+        types_or: [rust, markdown]
+        pass_filenames: false
