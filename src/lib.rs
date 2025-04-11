@@ -39,14 +39,17 @@
 #![forbid(unsafe_code)]
 
 mod backend;
-mod user;
-mod session;
-mod password;
 mod hash_utils;
+mod password;
+mod session;
+mod user;
 pub use backend::{Backend, CookieSessionBackend};
+pub use password::{
+    Authenticated, BadPassword, HashedPassword, MAX_PASSWORD_LENGTH,
+    MIN_PASSWORD_LENGTH, ValidPassword,
+};
+pub use session::{Session, SessionFields, SessionId};
 pub use user::User;
-pub use session::{Session, SessionId, SessionFields};
-pub use password::{HashedPassword, ValidPassword, BadPassword, Authenticated, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH};
 
 mod func;
 

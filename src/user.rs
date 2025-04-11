@@ -58,19 +58,23 @@ impl<U: User> SessionUser<U> {
         }
     }
 
-    pub async fn user<B: Backend<User = U>>(&self, backend: &B) -> Result<Option<&U>, B::Error> {
+    pub async fn user<B: Backend<User = U>>(
+        &self,
+        backend: &B,
+    ) -> Result<Option<&U>, B::Error> {
         enum Error<E> {
             UserNotFound,
             Inner(E),
         }
         if let Some(id) = &self.id {
-            let result = self.user.get_or_try_init(async || {
-                match backend.load_user(id).await {
+            let result = self
+                .user
+                .get_or_try_init(async || match backend.load_user(id).await {
                     Ok(Some(user)) => Ok(user),
                     Ok(None) => Err(Error::UserNotFound),
                     Err(e) => Err(Error::Inner(e)),
-                }
-            }).await;
+                })
+                .await;
             match result {
                 Ok(user) => Ok(Some(user)),
                 Err(Error::UserNotFound) => Ok(None),
@@ -81,7 +85,10 @@ impl<U: User> SessionUser<U> {
         }
     }
 
-    pub async fn user_mut<B: Backend<User = U>>(&mut self, backend: &B) -> Result<Option<&mut U>, B::Error> {
+    pub async fn user_mut<B: Backend<User = U>>(
+        &mut self,
+        backend: &B,
+    ) -> Result<Option<&mut U>, B::Error> {
         self.user(backend).await?;
         Ok(self.user.get_mut())
     }

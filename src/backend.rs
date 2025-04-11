@@ -1,4 +1,4 @@
-use crate::{SessionId, User, HashedPassword, SessionFields};
+use crate::{HashedPassword, SessionFields, SessionId, User};
 
 macro_rules! future {
     (Output = Result<$type:ty, Error>) => {
@@ -9,7 +9,7 @@ macro_rules! future {
 /// The interface for a backend.
 pub trait Backend: Send + Sized {
     /// The user type.
-    type User: User;    
+    type User: User;
     /// The implementation-defined session data type.
     type SessionData: Send;
     /// The backend error type.

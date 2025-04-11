@@ -1,4 +1,4 @@
-use password_hash::{PasswordHasher, ParamsString, Error};
+use password_hash::{Error, ParamsString, PasswordHasher};
 
 /// This struct exists because a reference to a struct
 /// does not implement `PasswordHasher`. Since we cannot
@@ -28,7 +28,11 @@ impl<T: PasswordHasher + 'static> PasswordHasher for HasherRef<T> {
         unreachable!()
     }
 
-    fn hash_password<'a>(&self, password: &[u8], salt: impl Into<password_hash::Salt<'a>>) -> password_hash::Result<password_hash::PasswordHash<'a>> {
+    fn hash_password<'a>(
+        &self,
+        password: &[u8],
+        salt: impl Into<password_hash::Salt<'a>>,
+    ) -> password_hash::Result<password_hash::PasswordHash<'a>> {
         <T as PasswordHasher>::hash_password(self.0, password, salt)
     }
 }
@@ -48,7 +52,9 @@ impl TryFrom<Params> for ParamsString {
 impl<'a> TryFrom<&'a password_hash::PasswordHash<'a>> for Params {
     type Error = password_hash::Error;
 
-    fn try_from(_: &'a password_hash::PasswordHash) -> Result<Self, password_hash::Error> {
+    fn try_from(
+        _: &'a password_hash::PasswordHash,
+    ) -> Result<Self, password_hash::Error> {
         unreachable!()
     }
 }

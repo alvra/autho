@@ -85,22 +85,25 @@ pub struct ValidPassword(String);
 
 impl ValidPassword {
     /// Validate a password.
-    pub async fn new(password: String, fields: &[&str]) -> Result<Self, BadPassword> {
+    pub async fn new(
+        password: String,
+        fields: &[&str],
+    ) -> Result<Self, BadPassword> {
         if password.len() < MIN_PASSWORD_LENGTH {
-            return Err(BadPassword::TooShort)
+            return Err(BadPassword::TooShort);
         }
         if password.len() > MAX_PASSWORD_LENGTH {
-            return Err(BadPassword::TooLong)
+            return Err(BadPassword::TooLong);
         }
         #[cfg(feature = "zxcvbn")]
         {
             let entropy = zxcvbn::zxcvbn(&password, fields);
             if entropy.score() < MIN_PASSWORD_SCORE {
-                return Err(BadPassword::Weak(entropy))
+                return Err(BadPassword::Weak(entropy));
             }
         }
         #[cfg(not(feature = "zxcvbn"))]
-        let _ = fields;  // Avoid unused variable warning.
+        let _ = fields; // Avoid unused variable warning.
         Ok(Self(password))
     }
 }
@@ -113,7 +116,11 @@ impl HashedPassword {
     pub fn new(password: &ValidPassword) -> Self {
         let salt = generate_salt();
         let algo = algorithm_generate();
-        Self(password_hash::PasswordHash::generate(algo, &password.0, &salt).unwrap().serialize())
+        Self(
+            password_hash::PasswordHash::generate(algo, &password.0, &salt)
+                .unwrap()
+                .serialize(),
+        )
     }
 
     /// Verify a password against a hashed password.
@@ -121,12 +128,13 @@ impl HashedPassword {
     /// This functions returns a compile-time token to prove authentication.
     /// If the password is invalid, this returns `None`.
     pub fn verify(&self, password: &str) -> Option<Authenticated> {
+        let hash = self.0.password_hash();
         for algo in algorithms_verify() {
-            if algo.verify_password(password.as_ref(), &self.0.password_hash()).is_ok() {
-                return Some(Authenticated(()))
+            if algo.verify_password(password.as_ref(), &hash).is_ok() {
+                return Some(Authenticated(()));
             }
         }
-        return None
+        return None;
     }
 
     /// Get the hashed password as a string.

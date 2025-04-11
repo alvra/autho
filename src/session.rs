@@ -1,13 +1,16 @@
 use std::cell::Cell;
 
-use crate::{Backend, ValidPassword, Authenticated, User};
 use crate::user::SessionUser;
+use crate::{Authenticated, Backend, User, ValidPassword};
 
 /// A unique identifier to associate a user with a session.
 ///
 /// This value is intended to be shared with users to identify themselves.
 #[derive(Copy, Clone, PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(feature = "postgres", derive(postgres_types::ToSql, postgres_types::FromSql))]
+#[cfg_attr(
+    feature = "postgres",
+    derive(postgres_types::ToSql, postgres_types::FromSql)
+)]
 pub struct SessionId(pub uuid::Uuid);
 
 impl SessionId {
@@ -82,7 +85,10 @@ impl<B: Backend> Session<B> {
     }
 
     /// Change the user associated with the session.
-    pub(crate) fn set_user_id(&mut self, user_id: Option<<B::User as User>::Id>) {
+    pub(crate) fn set_user_id(
+        &mut self,
+        user_id: Option<<B::User as User>::Id>,
+    ) {
         if user_id.as_ref() != self.user.id() {
             self.needs_save();
         }
@@ -112,19 +118,27 @@ impl<B: Backend> Session<B> {
 
     /// Save this session in the backend, even if it has not been marked as needing to be saved.
     pub async fn force_save(&self) -> Result<(), B::Error> {
-        self.backend.update_session_data(&self.id, self.user.id(), &self.data).await?;
+        self.backend
+            .update_session_data(&self.id, self.user.id(), &self.data)
+            .await?;
         self.needs_save.set(false);
         Ok(())
     }
 
     /// Force a different user to be logged into the session.
-    pub async fn force_login(&mut self, user_id: <B::User as User>::Id) -> Result<(), B::Error> {
+    pub async fn force_login(
+        &mut self,
+        user_id: <B::User as User>::Id,
+    ) -> Result<(), B::Error> {
         self.set_user_id(Some(user_id));
         Ok(())
     }
 
     /// Force a different user to be logged into the session.
-    pub async fn force_login_user(&mut self, user: B::User) -> Result<(), B::Error> {
+    pub async fn force_login_user(
+        &mut self,
+        user: B::User,
+    ) -> Result<(), B::Error> {
         self.set_user(Some(user));
         Ok(())
     }
@@ -147,9 +161,7 @@ impl<B: Backend> Session<B> {
     ///
     /// If no user is currently logged into this session,
     /// this function does nothing.
-    pub async fn logout(
-        &mut self,
-    ) -> Result<(), B::Error> {
+    pub async fn logout(&mut self) -> Result<(), B::Error> {
         self.set_user(None);
         Ok(())
     }

@@ -1,7 +1,7 @@
 use std::error::Error;
 
 use bytes::BytesMut;
-use postgres_types::{ToSql, FromSql, IsNull, Type};
+use postgres_types::{FromSql, IsNull, ToSql, Type};
 
 use crate::HashedPassword;
 
@@ -11,7 +11,8 @@ impl ToSql for HashedPassword {
         ty: &Type,
         out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn Error + Sync + Send>>
-       where Self: Sized
+    where
+        Self: Sized,
     {
         <&str as ToSql>::to_sql(&self.as_str(), ty, out)
     }
@@ -25,7 +26,8 @@ impl ToSql for HashedPassword {
     }
 
     fn accepts(ty: &Type) -> bool
-       where Self: Sized
+    where
+        Self: Sized,
     {
         <&str as ToSql>::accepts(ty)
     }
@@ -37,7 +39,8 @@ impl<'a> FromSql<'a> for HashedPassword {
         raw: &'a [u8],
     ) -> Result<Self, Box<dyn Error + Sync + Send>> {
         let s = <String as FromSql>::from_sql(ty, raw)?;
-        s.parse().map_err(|e| Box::new(e) as Box<dyn Error + Sync + Send>)
+        s.parse()
+            .map_err(|e| Box::new(e) as Box<dyn Error + Sync + Send>)
     }
 
     fn accepts(ty: &Type) -> bool {
