@@ -15,6 +15,7 @@ pub struct SessionId(pub uuid::Uuid);
 
 impl SessionId {
     /// Generate a new unique session id.
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self(uuid::Uuid::new_v4())
     }

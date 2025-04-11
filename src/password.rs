@@ -134,7 +134,7 @@ impl HashedPassword {
                 return Some(Authenticated(()));
             }
         }
-        return None;
+        None
     }
 
     /// Get the hashed password as a string.
