@@ -1,0 +1,33 @@
+[package]
+name = "autho"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+authors = ["Alexander van Ratingen"]
+homepage = "https://github.com/alvra/autho"
+repository = "https://github.com/alvra/autho"
+documentation = "https://docs.rs/autho"
+description = "Authentication for web applications"
+readme = "README.md"
+category = ["authentication", "web-programming", "asynchronous"]
+keywords = ["web", "authentication", "async"]
+
+[dependencies]
+tokio = { version = "1.44.2", features = ["sync"], default-features = false }
+uuid = { version = "1.16.0", features = ["v4"] }
+password-hash = { version = "0.5.0", features = ["std"] }
+argon2 = "0.5.3"
+rand = "0.8.5"
+zxcvbn = { version = "3.1.0", optional = true }
+
+postgres-types = { version = "0.2.9", features = ["derive", "with-uuid-1"], optional = true }
+bytes = { version = "1.10.1", optional = true }
+
+axum = { version = "0.8.3", optional = true }
+axum-extra = { version = "0.10.1", features = ["cookie"], optional = true }
+
+[features]
+postgres = ["dep:postgres-types", "dep:bytes"]
+axum = ["dep:axum", "dep:axum-extra"]
+
+hash-algorithms-v1 = []
